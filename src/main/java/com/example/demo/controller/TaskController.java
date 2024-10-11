@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.text.ParseException;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,19 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.ErrorResponseDto;
 import com.example.demo.dto.TaskDto;
+import com.example.demo.dto.TaskResponseDto;
 import com.example.demo.dto.UpdateTaskDto;
 import com.example.demo.entity.TaskEntity;
+import com.example.demo.service.NoteService;
 import com.example.demo.service.TaskService;
 
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
 
-	private final TaskService taskService;
+	@Autowired
+	TaskService taskService;
 
-	public TaskController(TaskService taskService) {
-		this.taskService = taskService;
-	}
+	@Autowired
+	NoteService noteService;
+
+	private ModelMapper modelMapper = new ModelMapper();
 
 	@GetMapping("")
 	public ResponseEntity<List<TaskEntity>> getTasks() {
@@ -37,12 +43,15 @@ public class TaskController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<TaskEntity> getTaskById(@PathVariable("id") Integer id) {
+	public ResponseEntity<TaskResponseDto> getTaskById(@PathVariable Integer id) {
 		TaskEntity task = taskService.getTaskById(id);
+		var notes = noteService.getNotesForTask(id);
 		if (task == null) {
 			return ResponseEntity.notFound().build();
 		}
-		return ResponseEntity.ok(task);
+		var taskResponse = modelMapper.map(task, TaskResponseDto.class);
+		taskResponse.setNotes(notes);
+		return ResponseEntity.ok(taskResponse);
 	}
 
 	@PostMapping("")
@@ -61,6 +70,7 @@ public class TaskController {
 			return ResponseEntity.notFound().build();
 
 		}
+
 		return ResponseEntity.ok(task);
 
 	}

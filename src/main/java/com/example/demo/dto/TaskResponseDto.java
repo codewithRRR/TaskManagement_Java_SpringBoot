@@ -1,16 +1,17 @@
-package com.example.demo.entity;
+package com.example.demo.dto;
 
 import java.util.Date;
 import java.util.List;
 
-public class TaskEntity {
+import com.example.demo.entity.NoteEntity;
 
+public class TaskResponseDto {
 	private int id;
 	private String title;
 	private String description;
 	private Date deadline;
 	private boolean completed;
-	
+	public List<NoteEntity> notes;
 
 	public int getId() {
 		return id;
@@ -51,7 +52,17 @@ public class TaskEntity {
 	public void setCompleted(boolean completed) {
 		this.completed = completed;
 	}
+	
 
+	public List<NoteEntity> getNotes() {
+		return notes;
+	}
 
+	public void setNotes(List<NoteEntity> notes) {
+		this.notes = notes;
+	}
 
+	public TaskResponseDto() {
+
+	}
 }
